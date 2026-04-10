@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TAM QA Checklist App</title>
+<style>
+  :root {
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+    --success-btn: #10b981;
+    --success-btn-hover: #059669;
+    --bg-main: #f8fafc;
+    --bg-card: #ffffff;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --success: #16a34a;
+    --warning: #d97706;
+    --danger: #dc2626;
+    --radius: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+  body { background: var(--bg-main); color: var(--text-main); padding: 2rem; max-width: 800px; margin: 0 auto; }
+  
+  .header { margin-bottom: 2rem; border-bottom: 2px solid var(--border); padding-bottom: 1rem; }
+  .header h1 { font-size: 1.5rem; color: var(--primary); }
+  .header p { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem; }
+
+  .meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+  .input-group { display: flex; flex-direction: column; gap: 0.25rem; }
+  .input-group label { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
+  .input-group input, .input-group select { 
+    padding: 0.5rem; border: 1px solid var(--border); border-radius: var(--radius); font-size: 0.9rem; outline: none; 
+  }
+  .input-group input:focus, .input-group select:focus { border-color: var(--primary); }
+
+  .progress-container { background: var(--bg-card); padding: 1rem; border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 2rem; }
+  .progress-stats { display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem; }
+  .progress-bar-bg { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: var(--success); width: 0%; transition: width 0.3s ease; }
+
+  .section { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 1rem; overflow: hidden; }
+  .section-header { background: #f1f5f9; padding: 1rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 600; }
+  .section-header:hover { background: #e2e8f0; }
+  .section-body { padding: 1rem; display: none; }
+  .section-body.active { display: block; }
+
+  .task-item { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.5rem 0; border-bottom: 1px solid #f1f5f9; }
+  .task-item:last-child { border-bottom: none; }
+  .task-item input { margin-top: 0.25rem; width: 1.1rem; height: 1.1rem; cursor: pointer; accent-color: var(--primary); }
+  .task-item label { font-size: 0.95rem; cursor: pointer; flex: 1; line-height: 1.4; }
+  .task-item.completed label { text-decoration: line-through; color: var(--text-muted); }
+
+  .badge { font-size: 0.7rem; padding: 0.1rem 0.4rem; border-radius: 4px; font-weight: bold; margin-left: 0.5rem; vertical-align: middle; }
+  .badge-critical { background: #fee2e2; color: var(--danger); }
+  .badge-warn { background: #fef3c7; color: var(--warning); }
+  
+  .notes-area { width: 100%; min-height: 60px; margin-top: 1rem; padding: 0.5rem; border: 1px solid var(--border); border-radius: var(--radius); resize: vertical; font-size: 0.9rem; }
+
+  .actions { display: flex; gap: 1rem; margin-top: 2rem; flex-wrap: wrap; padding-top: 1rem; border-top: 1px solid var(--border); }
+  button { padding: 0.6rem 1.2rem; border: none; border-radius: var(--radius); cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: background 0.2s; }
+  
+  .btn-submit { background: var(--success-btn); color: white; flex-grow: 1; text-align: center;}
+  .btn-submit:hover { background: var(--success-btn-hover); }
+  .btn-submit:disabled { background: #9ca3af; cursor: not-allowed; }
+  
+  .btn-primary { background: var(--primary); color: white; }
+  .btn-primary:hover { background: var(--primary-hover); }
+  .btn-danger { background: white; color: var(--danger); border: 1px solid var(--danger); }
+  .btn-danger:hover { background: #fee2e2; }
+
+  @media print {
+    body { padding: 0; background: white; }
+    .actions { display: none; }
+    .section-body { display: block !important; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>TAM Pixel QA & Implementation Checklist</h1>
+    <p>Standardized workflow for DSP Pixel Creation, GTM Audit, and Troubleshooting</p>
+  </div>
+
+  <div class="meta-grid">
+    <div class="input-group">
+      <label>Advertiser Name</label>
+      <input type="text" id="advertiser" placeholder="e.g. Acme Corp" oninput="saveData()">
+    </div>
+    <div class="input-group">
+      <label>DSP Platform</label>
+      <select id="dsp" onchange="saveData()">
+        <option value="">Select DSP...</option>
+        <option>DV360</option>
+        <option>The Trade Desk</option>
+        <option>Amazon DSP</option>
+        <option>MediaMath</option>
+        <option>Xandr</option>
+        <option>Yahoo DSP</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="input-group">
+      <label>TAM Assignee</label>
+      <input type="text" id="assignee" placeholder="Your Name" oninput="saveData()">
+    </div>
+  </div>
+
+  <div class="progress-container">
+    <div class="progress-stats">
+      <span>Overall Progress</span>
+      <span id="progress-text">0% (0/0)</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progress-bar"></div>
+    </div>
+  </div>
+
+  <div id="checklist-container"></div>
+
+  <div class="actions">
+    <button class="btn-submit" id="submitBtn" onclick="submitToGoogleSheets()">Submit to Google Sheets</button>
+    <button class="btn-primary" onclick="window.print()">Export PDF</button>
+    <button class="btn-danger" onclick="clearData()">Clear Data</button>
+  </div>
+
+<script>
+  // ==========================================
+  // 🔴 PASTE YOUR GOOGLE APPS SCRIPT URL BELOW
+  // ==========================================
+  const WEBHOOK_URL = "PASTE_YOUR_COPIED_WEB_APP_URL_HERE";
+
+  const checkListData = [
+    {
+      id: "creation", title: "1. Pixel Creation",
+      tasks: [
+        { id: "c1", text: "Pixel type confirmed with client (Impression/Click/Conversion)", tag: "Critical" },
+        { id: "c2", text: "Naming convention aligns with taxonomy standards" },
+        { id: "c3", text: "Correct DSP pixel template generated" },
+        { id: "c4", text: "Dynamic parameters (Revenue, Order ID) configured correctly" }
+      ]
+    },
+    {
+      id: "audit", title: "2. Website Pixel Audit",
+      tasks: [
+        { id: "a1", text: "No duplicate pixel fires on a single page load", tag: "Critical" },
+        { id: "a2", text: "Pixel fires correctly on the designated target URL" },
+        { id: "a3", text: "Data layer variables populate before pixel fires", tag: "Warn" },
+        { id: "a4", text: "Network tab shows 200 OK status for the pixel payload" }
+      ]
+    },
+    {
+      id: "gtm", title: "3. GTM Implementation",
+      tasks: [
+        { id: "g1", text: "Correct GTM Workspace and Container validated", tag: "Critical" },
+        { id: "g2", text: "DSP Tag created using Custom HTML or Native Template" },
+        { id: "g3", text: "Trigger properly mapped to Custom Event or Page View" },
+        { id: "g4", text: "Tag sequencing or Consent Mode (CMP) dependencies configured", tag: "Warn" }
+      ]
+    },
+    {
+      id: "debug", title: "4. Debug & Preview Mode",
+      tasks: [
+        { id: "d1", text: "GTM Preview connected successfully to target domain" },
+        { id: "d2", text: "Tag fires successfully on expected Trigger event", tag: "Critical" },
+        { id: "d3", text: "Dynamic variables pass correct values in Tag Details" },
+        { id: "d4", text: "No unexpected Tag fires on unmapped events" }
+      ]
+    },
+    {
+      id: "troubleshoot", title: "5. Troubleshooting & Handoff",
+      tasks: [
+        { id: "t1", text: "Console errors investigated and logged if related to pixel" },
+        { id: "t2", text: "Ad blockers disabled during testing to verify baseline fire" },
+        { id: "t3", text: "DSP reporting reflects active pixel signal reception", tag: "Critical" },
+        { id: "t4", text: "Client/Agency notified of QA completion and live status" }
+      ]
+    }
+  ];
+
+  const container = document.getElementById('checklist-container');
+  let state = JSON.parse(localStorage.getItem('tamQaState')) || { checks: {}, notes: {}, meta: {} };
+
+  function renderApp() {
+    container.innerHTML = '';
+    
+    if(state.meta.advertiser) document.getElementById('advertiser').value = state.meta.advertiser;
+    if(state.meta.dsp) document.getElementById('dsp').value = state.meta.dsp;
+    if(state.meta.assignee) document.getElementById('assignee').value = state.meta.assignee;
+
+    checkListData.forEach((section) => {
+      const secDiv = document.createElement('div');
+      secDiv.className = 'section';
+      
+      const secHeader = document.createElement('div');
+      secHeader.className = 'section-header';
+      secHeader.innerHTML = `<span>${section.title}</span> <span>▼</span>`;
+      secHeader.onclick = () => {
+        secBody.classList.toggle('active');
+        secHeader.innerHTML = `<span>${section.title}</span> <span>${secBody.classList.contains('active') ? '▲' : '▼'}</span>`;
+      };
+
+      const secBody = document.createElement('div');
+      secBody.className = 'section-body active';
+
+      section.tasks.forEach(task => {
+        const isChecked = state.checks[task.id] || false;
+        const taskDiv = document.createElement('div');
+        taskDiv.className = `task-item ${isChecked ? 'completed' : ''}`;
+        
+        let badgeHtml = '';
+        if(task.tag === 'Critical') badgeHtml = `<span class="badge badge-critical">Critical</span>`;
+        if(task.tag === 'Warn') badgeHtml = `<span class="badge badge-warn">Check</span>`;
+
+        taskDiv.innerHTML = `
+          <input type="checkbox" id="${task.id}" ${isChecked ? 'checked' : ''} onchange="toggleTask('${task.id}', this)">
+          <label for="${task.id}">${task.text} ${badgeHtml}</label>
+        `;
+        secBody.appendChild(taskDiv);
+      });
+
+      const notes = document.createElement('textarea');
+      notes.className = 'notes-area';
+      notes.placeholder = `Notes for ${section.title}...`;
+      notes.value = state.notes[section.id] || '';
+      notes.oninput = (e) => saveNotes(section.id, e.target.value);
+      secBody.appendChild(notes);
+
+      secDiv.appendChild(secHeader);
+      secDiv.appendChild(secBody);
+      container.appendChild(secDiv);
+    });
+
+    updateProgress();
+  }
+
+  function toggleTask(id, el) {
+    state.checks[id] = el.checked;
+    el.parentElement.classList.toggle('completed', el.checked);
+    saveData();
+    updateProgress();
+  }
+
+  function saveNotes(sectionId, val) {
+    state.notes[sectionId] = val;
+    saveData();
+  }
+
+  function saveData() {
+    state.meta.advertiser = document.getElementById('advertiser').value;
+    state.meta.dsp = document.getElementById('dsp').value;
+    state.meta.assignee = document.getElementById('assignee').value;
+    localStorage.setItem('tamQaState', JSON.stringify(state));
+  }
+
+  function clearData() {
+    if(confirm("Are you sure you want to clear all data? This cannot be undone.")) {
+      localStorage.removeItem('tamQaState');
+      state = { checks: {}, notes: {}, meta: {} };
+      document.getElementById('advertiser').value = '';
+      document.getElementById('dsp').value = '';
+      document.getElementById('assignee').value = '';
+      renderApp();
+    }
+  }
+
+  function updateProgress() {
+    const totalTasks = checkListData.reduce((acc, curr) => acc + curr.tasks.length, 0);
+    const completedTasks = Object.values(state.checks).filter(v => v).length;
+    const percentage = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
+    
+    document.getElementById('progress-text').innerText = `${percentage}% (${completedTasks}/${totalTasks})`;
+    document.getElementById('progress-bar').style.width = `${percentage}%`;
+    return `${percentage}% (${completedTasks}/${totalTasks})`;
+  }
+
+  // --- NEW FUNCTION: Send data to Google Sheets ---
+  async function submitToGoogleSheets() {
+    if (WEBHOOK_URL === "PASTE_YOUR_COPIED_WEB_APP_URL_HERE") {
+      alert("Please update the WEBHOOK_URL variable in the code with your Google Apps Script URL.");
+      return;
+    }
+
+    const advertiser = document.getElementById('advertiser').value;
+    if(!advertiser) {
+      alert("Please fill in the Advertiser Name before submitting.");
+      return;
+    }
+
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.innerText = "Submitting...";
+    submitBtn.disabled = true;
+
+    // Format all notes into a single string for the sheet
+    let combinedNotes = "";
+    checkListData.forEach(sec => {
+      if(state.notes[sec.id] && state.notes[sec.id].trim() !== "") {
+        combinedNotes += `[${sec.title}]: ${state.notes[sec.id]}\n`;
+      }
+    });
+
+    const payload = {
+      advertiser: advertiser,
+      dsp: document.getElementById('dsp').value,
+      assignee: document.getElementById('assignee').value,
+      progress: updateProgress(),
+      details: combinedNotes || "No notes provided."
+    };
+
+    try {
+      // Using text/plain prevents CORS preflight errors with Google Apps Script
+      const response = await fetch(WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      });
+      
+      const result = await response.json();
+      
+      if(result.result === "success") {
+        alert("Success! Your QA Audit has been logged in Google Sheets.");
+      } else {
+        alert("Error logging data: " + result.error);
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Network error. Could not reach Google Sheets.");
+    } finally {
+      submitBtn.innerText = "Submit to Google Sheets";
+      submitBtn.disabled = false;
+    }
+  }
+
+  renderApp();
+</script>
+</body>
+</html>
